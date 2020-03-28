@@ -1,16 +1,13 @@
 <schemalist gettext-domain="customgestures">
     <enum id="org.gnome.shell.extensions.customgestures.actions">
         <value value="0" nick="overview"/>
-        <value value="1" nick="cycle-apps"/>
-        <value value="2" nick="app-drawer"/>
-        <value value="3" nick="switch-workspace"/>
-        <value value="4" nick="show-desktop"/>
-        <value value="5" nick="nothing"/>
-        <value value="6" nick="next-workspace"/>
-        <value value="7" nick="previous-workspace"/>
-        <value value="8" nick="go-forward"/>
-        <value value="9" nick="go-back"/>
-        <value value="10" nick="app-drawer-unanimated"/>
+        <value value="1" nick="reverse-overview"/>
+        <value value="2" nick="reverse-overview1"/>
+        <value value="3" nick="overview1"/>
+        <value value="4" nick="next-window"/>
+        <value value="5" nick="prev-window"/>
+        <value value="6" nick="prev-window1"/>
+        <value value="7" nick="next-window1"/>
     </enum>
     <schema id="org.gnome.shell.extensions.customgestures" path="/org/gnome/shell/extensions/customgestures/">
         <key name="left-three-swipes" type="b">
@@ -19,7 +16,7 @@
             <description>If true, horizontal left 3 finger gestures will perform an actions as set by the user</description>
         </key>
         <key name="left-three-action" enum="org.gnome.shell.extensions.customgestures.actions">
-            <default>'overview'</default>
+            <default>'next-window'</default>
             <summary>3 Finger Left Horizontal Swipe Action</summary>
             <description>The action to perform when a 3 finger left horizontal swipe gesture is recognized</description>
         </key>
@@ -29,7 +26,7 @@
             <description>If true, horizontal right 3 finger gestures will perform an actions as set by the user</description>
         </key>
         <key name="right-three-action" enum="org.gnome.shell.extensions.customgestures.actions">
-            <default>'overview'</default>
+            <default>'prev-window'</default>
             <summary>3 Finger Right Horizontal Swipe Action</summary>
             <description>The action to perform when a 3 finger right horizontal swipe gesture is recognized</description>
         </key>
@@ -39,7 +36,7 @@
             <description>If true, vertical up 3 finger gestures will perform an actions as set by the user</description>
         </key>
         <key name="up-three-action" enum="org.gnome.shell.extensions.customgestures.actions">
-            <default>'switch-workspace'</default>
+            <default>'overview'</default>
             <summary>3 Finger Up Vertical Swipe Action</summary>
             <description>The action to perform when a 3 finger up vertical swipe gesture is recognized</description>
         </key>
@@ -49,7 +46,7 @@
             <description>If true, vertical down 3 finger gestures will perform an actions as set by the user</description>
         </key>
         <key name="down-three-action" enum="org.gnome.shell.extensions.customgestures.actions">
-            <default>'switch-workspace'</default>
+            <default>'reverse-overview'</default>
             <summary>3 Finger Down Vertical Swipe Action</summary>
             <description>The action to perform when a 3 finger down vertical swipe gesture is recognized</description>
         </key>
