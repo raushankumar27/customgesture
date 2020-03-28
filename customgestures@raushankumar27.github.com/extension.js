@@ -7,7 +7,7 @@ const Shell = imports.gi.Shell;
 const Signals = imports.signals;
 const Utils = imports.misc.extensionUtils;
 
-const Gettext = imports.gettext.domain('extendedgestures');
+const Gettext = imports.gettext.domain('customgestures');
 const _ = Gettext.gettext;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Convenience = Extension.imports.convenience;

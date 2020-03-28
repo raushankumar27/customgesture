@@ -1,5 +1,5 @@
-<schemalist gettext-domain="extendedgestures">
-    <enum id="org.gnome.shell.extensions.extendedgestures.actions">
+<schemalist gettext-domain="customgestures">
+    <enum id="org.gnome.shell.extensions.customgestures.actions">
         <value value="0" nick="overview"/>
         <value value="1" nick="cycle-apps"/>
         <value value="2" nick="app-drawer"/>
@@ -12,13 +12,13 @@
         <value value="9" nick="go-back"/>
         <value value="10" nick="app-drawer-unanimated"/>
     </enum>
-    <schema id="org.gnome.shell.extensions.extendedgestures" path="/org/gnome/shell/extensions/extendedgestures/">
+    <schema id="org.gnome.shell.extensions.customgestures" path="/org/gnome/shell/extensions/customgestures/">
         <key name="left-three-swipes" type="b">
             <default>true</default>
             <summary>3 Finger Left Horizontal Swipes</summary>
             <description>If true, horizontal left 3 finger gestures will perform an actions as set by the user</description>
         </key>
-        <key name="left-three-action" enum="org.gnome.shell.extensions.extendedgestures.actions">
+        <key name="left-three-action" enum="org.gnome.shell.extensions.customgestures.actions">
             <default>'overview'</default>
             <summary>3 Finger Left Horizontal Swipe Action</summary>
             <description>The action to perform when a 3 finger left horizontal swipe gesture is recognized</description>
@@ -28,7 +28,7 @@
             <summary>3 Finger Right Horizontal Swipes</summary>
             <description>If true, horizontal right 3 finger gestures will perform an actions as set by the user</description>
         </key>
-        <key name="right-three-action" enum="org.gnome.shell.extensions.extendedgestures.actions">
+        <key name="right-three-action" enum="org.gnome.shell.extensions.customgestures.actions">
             <default>'overview'</default>
             <summary>3 Finger Right Horizontal Swipe Action</summary>
             <description>The action to perform when a 3 finger right horizontal swipe gesture is recognized</description>
@@ -38,7 +38,7 @@
             <summary>3 Finger Up Vertical Swipes</summary>
             <description>If true, vertical up 3 finger gestures will perform an actions as set by the user</description>
         </key>
-        <key name="up-three-action" enum="org.gnome.shell.extensions.extendedgestures.actions">
+        <key name="up-three-action" enum="org.gnome.shell.extensions.customgestures.actions">
             <default>'switch-workspace'</default>
             <summary>3 Finger Up Vertical Swipe Action</summary>
             <description>The action to perform when a 3 finger up vertical swipe gesture is recognized</description>
@@ -48,7 +48,7 @@
             <summary>3 Finger Down Vertical Swipes</summary>
             <description>If true, vertical down 3 finger gestures will perform an actions as set by the user</description>
         </key>
-        <key name="down-three-action" enum="org.gnome.shell.extensions.extendedgestures.actions">
+        <key name="down-three-action" enum="org.gnome.shell.extensions.customgestures.actions">
             <default>'switch-workspace'</default>
             <summary>3 Finger Down Vertical Swipe Action</summary>
             <description>The action to perform when a 3 finger down vertical swipe gesture is recognized</description>

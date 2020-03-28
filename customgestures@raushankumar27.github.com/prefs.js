@@ -3,7 +3,7 @@ const Gtk = imports.gi.Gtk;
 const GObject = imports.gi.GObject;
 const Lang = imports.lang;
 
-const Gettext = imports.gettext.domain('extendedgestures');
+const Gettext = imports.gettext.domain('customgestures');
 const _ = Gettext.gettext;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Convenience = Extension.imports.convenience;
@@ -14,9 +14,9 @@ function init() {
     schema = Convenience.getSettings();
 }
 
-const ExtendedGesturesSettingsWidget = new GObject.Class({
-    Name: 'ExtendedGestures.prefs.ExtendedGesturesSettingsWidget',
-    GTypeName: 'ExtendedGesturesSettingsWidget',
+const customGesturesSettingsWidget = new GObject.Class({
+    Name: 'customGestures.prefs.customGesturesSettingsWidget',
+    GTypeName: 'customGesturesSettingsWidget',
     Extends: Gtk.VBox,
 
     _init: function (params) {
@@ -183,7 +183,7 @@ const ExtendedGesturesSettingsWidget = new GObject.Class({
 });
 
 function buildPrefsWidget () {
-    let settingsWidget = new ExtendedGesturesSettingsWidget ();
+    let settingsWidget = new customGesturesSettingsWidget ();
     settingsWidget.show_all ();
     return settingsWidget;
 }
