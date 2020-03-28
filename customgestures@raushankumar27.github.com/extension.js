@@ -44,16 +44,6 @@ const TouchpadGestureAction = new Lang.Class({
         this._gestureCallbackID = actor.connect('captured-event', Lang.bind(this, this._handleEvent));
         this._actionCallbackID = this.connect('activated', Lang.bind (this, this._doAction));
         this._updateSettingsCallbackID = schema.connect('changed', Lang.bind(this, this._updateSettings));
-
-        if (Clutter.DeviceManager) {
-            // gnome-shell <= 3.34 uses a device manager
-            let deviceManager = Clutter.DeviceManager.get_default();
-            this._virtualDevice = deviceManager.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
-        } else {
-            // gnome-shell >= 3.36 uses a seat
-            let seat = Clutter.get_default_backend().get_default_seat();
-            this._virtualDevice = seat.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
-        }
     },
 
     _checkActivated: function(fingerCount) {
@@ -217,22 +207,6 @@ const TouchpadGestureAction = new Lang.Class({
             default:
                 break;
         }
-    },
-
-    _switchWorkspace: function (sender, dir) {
-        // fix for gnome-shell >= 3.30
-        if (!versionSmaller330) {
-            let workspaceManager = global.workspace_manager;
-            let activeWorkspace = workspaceManager.get_active_workspace();
-            Main.wm._prepareWorkspaceSwitch(activeWorkspace.index(), -1);
-        }
-        Main.wm._actionSwitchWorkspace(sender, dir);
-    },
-
-    _sendKeyEvent: function (...keys) {
-        currentTime = Clutter.get_current_event_time();
-        keys.forEach(key => this._virtualDevice.notify_keyval(currentTime, key, Clutter.KeyState.PRESSED));
-        keys.forEach(key => this._virtualDevice.notify_keyval(currentTime, key, Clutter.KeyState.RELEASED));
     },
 
     _checkSwipeValid: function (dir, fingerCount, motion) {
