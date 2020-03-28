@@ -1,5 +1,6 @@
 # customgesture
-gnome extension based on the implementation of customgesture
+gnome extension based on the implementation of extendedgesture(
+    https://github.com/mpiannucci/gnome-shell-extended-gestures)
 
 Functionality:
 
