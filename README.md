@@ -1,4 +1,4 @@
-# customgesture
+# Customgesture
 gnome extension based on the implementation of customgesture
 
 Functionality:
