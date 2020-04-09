@@ -269,8 +269,7 @@ function activateNextWindowIndex(change){
         let workspaceManager = global.workspace_manager;
         let activeWorkspace = workspaceManager.get_active_workspace();
         return !win.is_override_redirect() &&
-                win.located_on_workspace(activeWorkspace) && 
-                win.get_transient_for() == null;
+                win.located_on_workspace(activeWorkspace); 
     }).sort((w1, w2) => {
         return w1.metaWindow.get_stable_sequence() -
                 w2.metaWindow.get_stable_sequence();
@@ -284,6 +283,7 @@ function activateNextWindowIndex(change){
     } else {
         for (let i = 0; i < windows.length; i++){
             if(focusWindow == windows[i].metaWindow){
+                if(focusWindow.get_transient_for() != null && change<0) change = change-1;
                 let index = i + change;
                 if(index >= windows.length){ 
                     index = 0;
@@ -291,6 +291,7 @@ function activateNextWindowIndex(change){
                     index=windows.length -1 ;
                 }
                 nextWindow = windows[index].metaWindow;
+                Main.notify(nextWindow);
                 Main.activateWindow(nextWindow);
                 return;
             }
