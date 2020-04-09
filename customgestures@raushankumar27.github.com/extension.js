@@ -291,7 +291,6 @@ function activateNextWindowIndex(change){
                     index=windows.length -1 ;
                 }
                 nextWindow = windows[index].metaWindow;
-                Main.notify(nextWindow);
                 Main.activateWindow(nextWindow);
                 return;
             }
