@@ -13,3 +13,4 @@ Can toggle setting to follow in reverse order
 Toggle application. Sequence will be based on window creation.
 Switch between open window.
 
+# Provide Suggestion for new feature
