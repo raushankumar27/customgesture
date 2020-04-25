@@ -1,12 +1,12 @@
 <schemalist gettext-domain="customgestures">
     <enum id="org.gnome.shell.extensions.customgestures.actions">
         <value value="0" nick="overview"/>
-        <value value="1" nick="reverse-overview"/>
-        <value value="2" nick="reverse-overview1"/>
-        <value value="3" nick="overview1"/>
-        <value value="4" nick="next-window"/>
-        <value value="5" nick="prev-window"/>
-        <value value="6" nick="prev-window1"/>
+        <value value="1" nick="reverse-overview1"/>
+        <value value="2" nick="next-window"/>
+        <value value="3" nick="prev-window1"/>
+        <value value="4" nick="reverse-overview"/>
+        <value value="5" nick="overview1"/>
+        <value value="6" nick="prev-window"/>
         <value value="7" nick="next-window1"/>
     </enum>
     <schema id="org.gnome.shell.extensions.customgestures" path="/org/gnome/shell/extensions/customgestures/">

@@ -107,13 +107,13 @@ const TouchpadGestureAction = new Lang.Class({
                     action = this._leftThreeAction;
                     break;
                 case Meta.MotionDirection.RIGHT:
-                    action = this._leftThreeAction+1;
+                    action = this._rightThreeAction;
                     break;
                 case Meta.MotionDirection.UP:
                     action = this._upThreeAction;
                     break;
                 case Meta.MotionDirection.DOWN:
-                    action = this._upThreeAction+1;
+                    action = this._downThreeAction;
                     break;
                 default:
                     break;
@@ -125,85 +125,31 @@ const TouchpadGestureAction = new Lang.Class({
         }
         switch (action) {
             case 0:
-                //if apps pagr is open close overview
-                if(Main.overview.viewSelector._showAppsButton.checked){
-                    Main.overview.hide();
-                }
-                //if overview is open show apps page
-                else if (Main.overview._shown){
-                    Main.overview.viewSelector.showApps();
-                }
-                //open overview
-                else{
-                    Main.overview.show();
-                }
+                //overview->apps->desktop
+                showOverview();
                 break;
             case 1:
-                //if on apps page switch to overview
-                if(Main.overview.viewSelector._showAppsButton.checked){
-                    Main.overview.viewSelector._toggleAppsPage();
-                }
-                //if on overview close it
-                else if(Main.overview._shown){
-                    Main.overview.toggle();
-                }
-                //if on desktop swich to app page
-                else {
-                    Main.overview.viewSelector.showApps();
-                }
+                //apps->overview->desktop
+                showOverviewReverse();
                 break;
             case 2:
-                //if on apps page switch to overview
-                if(Main.overview.viewSelector._showAppsButton.checked){
-                    Main.overview.viewSelector._toggleAppsPage();
-                }
-                //if on overview close it
-                else if(Main.overview._shown){
-                    Main.overview.toggle();
-                }
-                //if on desktop swich to app page
-                else {
-                    Main.overview.viewSelector.showApps();
-                }
+                activateNextWindowIndex(1);
                 break;
             case 3:
-                //if apps pagr is open close overview
-                if(Main.overview.viewSelector._showAppsButton.checked){
-                    Main.overview.hide();
-                }
-                //if overview is open show apps page
-                else if (Main.overview._shown){
-                    Main.overview.viewSelector.showApps();
-                }
-                //open overview
-                else{
-                    Main.overview.show();
-                }
-                break;
-            case 4:
-                //open next window
-                activateNextWindowIndex(1);
-                break;
-            case 5:
-                //open previous window
                 activateNextWindowIndex(-1);
                 break;
+            case 4:
+                showOverviewReverse();
+                break;
+            case 5:
+                showOverview();
+                break;
             case 6:
-                //open previous window
-                activateNextWindowIndex(-1)
+                activateNextWindowIndex(-1);
                 break;
             case 7:
-                //open next window
                 activateNextWindowIndex(1);
                 break;
-            case 8:
-                //
-                break;
-            case 9:
-                //
-                break;
-            case 10:
-                //
             default:
                 break;
         }
@@ -234,11 +180,11 @@ const TouchpadGestureAction = new Lang.Class({
         this._leftThreeEnabled = schema.get_boolean('left-three-swipes');
         this._leftThreeAction = schema.get_enum('left-three-action');
         this._rightThreeEnabled = schema.get_boolean('left-three-swipes');
-        this._rightThreeAction = schema.get_enum('left-three-action');
+        this._rightThreeAction = schema.get_enum('right-three-action');
         this._upThreeEnabled = schema.get_boolean('up-three-swipes');
         this._upThreeAction = schema.get_enum('up-three-action');
         this._downThreeEnabled = schema.get_boolean('up-three-swipes');
-        this._downThreeAction = schema.get_enum('up-three-action');
+        this._downThreeAction = schema.get_enum('down-three-action');
         this._verticalSensitivityAdjustment = schema.get_int('vertical-sensitivity-adjustment');
         this._horizontalSensitivityAdjustment = schema.get_int('horizontal-sensitivity-adjustment');
     },
@@ -295,5 +241,34 @@ function activateNextWindowIndex(change){
                 return;
             }
         }
+    }
+}
+
+function showOverview(){
+    //if apps pagr is open close overview
+    if(Main.overview.viewSelector._showAppsButton.checked){
+        Main.overview.hide();
+    }
+    //if overview is open show apps page
+    else if (Main.overview._shown){
+        Main.overview.viewSelector.showApps();
+    }
+    //open overview
+    else{
+        Main.overview.show();
+    }
+}
+function showOverviewReverse(){
+    //if on apps page switch to overview
+    if(Main.overview.viewSelector._showAppsButton.checked){
+        Main.overview.viewSelector._toggleAppsPage();
+    }
+    //if on overview close it
+    else if(Main.overview._shown){
+        Main.overview.toggle();
+    }
+    //if on desktop swich to app page
+    else {
+        Main.overview.viewSelector.showApps();
     }
 }

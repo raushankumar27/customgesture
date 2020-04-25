@@ -9,6 +9,12 @@ const Extension = imports.misc.extensionUtils.getCurrentExtension();
 const Convenience = Extension.imports.convenience;
 
 let schema = null;
+const actions = [
+    'Toggle Overview/App drawer/desktop',
+    'Reverse of Toggle Overview/App drawer/desktop',
+    'Switch Application',
+    'Reverse Switch Application'
+    ];
 
 function init() {
     schema = Convenience.getSettings();
@@ -85,12 +91,7 @@ const customGesturesSettingsWidget = new GObject.Class({
     },
 
     _initUI: function() {
-        const actions = [
-        'Toggle Overview/App drawer/desktop',
-        'Reverse of Toggle Overview/App drawer/desktop',
-        'Switch Application',
-        'Reverse Switch Application'
-        ];
+        
 
         // Bind the three swipe toggles to their setting values
         schema.bind('left-three-swipes', this._leftThreeSwitch, 'active', Gio.SettingsBindFlags.DEFAULT);
@@ -112,11 +113,13 @@ const customGesturesSettingsWidget = new GObject.Class({
     },
 
     _leftThreeComboChanged: function () {
-        schema.set_enum('left-three-action',2* this._leftThreeCombo.get_active());
+        schema.set_enum('left-three-action',this._leftThreeCombo.get_active());
+        schema.set_enum('right-three-action',this._leftThreeCombo.get_active()+actions.length);
     },  
 
     _upThreeComboChanged: function () {
-        schema.set_enum('up-three-action',2* this._upThreeCombo.get_active());
+        schema.set_enum('up-three-action',this._upThreeCombo.get_active());
+        schema.set_enum('down-three-action',this._upThreeCombo.get_active()+actions.length);
     },
 });
 
