@@ -35,12 +35,13 @@ const customGesturesSettingsWidget = new GObject.Class({
     _buildUI: function() {
         // The swipe options grid setup
         this._swipeOptionsFrame = new Gtk.Frame();
-        this._swipeOptionsFrame.set_label("Swipe Options");
+        this._swipeOptionsFrame.set_label("    Swipe Options");
         this._swipeOptionsGrid = new Gtk.Grid({
             column_homogeneous: false,
             column_spacing: 20,
             row_homogeneous: true,
-            row_spacing: 5
+            row_spacing: 5,
+            margin: 20
         });
         this._swipeOptionsFrame.add(this._swipeOptionsGrid);
         
@@ -64,12 +65,13 @@ const customGesturesSettingsWidget = new GObject.Class({
         
         // The sensitivity options
         this._sensitivityOptionsFrame = new Gtk.Frame();
-        this._sensitivityOptionsFrame.set_label("Sensitivity Options");
+        this._sensitivityOptionsFrame.set_label("    Sensitivity Options");
         this._sensitivityOptionsGrid = new Gtk.Grid({
             column_homogeneous: false,
             column_spacing: 20,
             row_homogeneous: true,
-            row_spacing: 5
+            row_spacing: 5,
+            margin:20
         });
         this._sensitivityOptionsFrame.add(this._sensitivityOptionsGrid);
 
