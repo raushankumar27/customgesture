@@ -4,6 +4,15 @@ gnome extension based on the implementation of extendedgesture(
 
 Functionality:
 
+# Download Link
+https://extensions.gnome.org/extension/2781/custom-3-finger-gestures/
+
+# Install from git
+Clone the repo, and run install.sh
+
+git clone 
+cd customgesture && sh install.sh
+
 # 3 Finger UP/Down
 
 Open overview->Open apps Page-> Closes overview
