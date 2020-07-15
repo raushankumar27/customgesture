@@ -4,10 +4,19 @@
         <value value="1" nick="reverse-overview1"/>
         <value value="2" nick="next-window"/>
         <value value="3" nick="prev-window1"/>
-        <value value="4" nick="reverse-overview"/>
-        <value value="5" nick="overview1"/>
-        <value value="6" nick="prev-window"/>
-        <value value="7" nick="next-window1"/>
+        <value value="4" nick="next-tab"/>
+        <value value="5" nick="prev-tab1"/>
+        <value value="6" nick="next-window-tab"/>
+        <value value="7" nick="prev-window-tab1"/>
+
+        <value value="8" nick="reverse-overview"/>
+        <value value="9" nick="overview1"/>
+        <value value="10" nick="prev-window"/>
+        <value value="11" nick="next-window1"/>
+        <value value="12" nick="prev-tab"/>
+        <value value="13" nick="next-tab1"/>
+        <value value="14" nick="prev-window-tab"/>
+        <value value="15" nick="next-window-tab1"/>
     </enum>
     <schema id="org.gnome.shell.extensions.customgestures" path="/org/gnome/shell/extensions/customgestures/">
         <key name="left-three-swipes" type="b">

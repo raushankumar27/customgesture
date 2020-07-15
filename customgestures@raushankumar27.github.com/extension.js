@@ -21,9 +21,6 @@ let lastTime = null;
 let previousWindowIndex = null;
 let currentTime = null;
 
-// Compatability settings
-let versionSmaller330 = Utils.versionCheck(["3.26", "3.28"], Config.PACKAGE_VERSION);
-
 let focusWindow = global.display.focus_window;
 let nextWindow;
 let windows;
@@ -44,6 +41,8 @@ const TouchpadGestureAction = new Lang.Class({
         this._gestureCallbackID = actor.connect('captured-event', Lang.bind(this, this._handleEvent));
         this._actionCallbackID = this.connect('activated', Lang.bind (this, this._doAction));
         this._updateSettingsCallbackID = schema.connect('changed', Lang.bind(this, this._updateSettings));
+        let seat = Clutter.get_default_backend().get_default_seat();
+        this._virtualDevice = seat.create_virtual_device(Clutter.InputDeviceType.KEYBOARD_DEVICE);
     },
 
     _checkActivated: function(fingerCount) {
@@ -133,23 +132,48 @@ const TouchpadGestureAction = new Lang.Class({
                 showOverviewReverse();
                 break;
             case 2:
-                activateNextWindowIndex(1);
+                activateNextWindowIndex(1,false);
                 break;
             case 3:
-                activateNextWindowIndex(-1);
+                activateNextWindowIndex(-1,false);
                 break;
             case 4:
-                showOverviewReverse();
+                nextTab(1);
                 break;
             case 5:
-                showOverview();
+                nextTab(-1);
                 break;
             case 6:
-                activateNextWindowIndex(-1);
+                activateNextWindowIndex(1,true);
                 break;
             case 7:
-                activateNextWindowIndex(1);
+                activateNextWindowIndex(-1,true);
                 break;
+            case 8:
+                showOverviewReverse();
+                break;
+            case 9:
+                showOverview();
+                break;
+            case 10:
+                activateNextWindowIndex(-1,false);
+                break;
+            case 11:
+                activateNextWindowIndex(1,false);
+                break;
+            case 12:
+                nextTab(-1);
+                break;
+            case 13:
+                nextTab(1);
+                break;
+            case 14:
+                activateNextWindowIndex(-1,true);
+                break;
+            case 15:
+                activateNextWindowIndex(1,true);
+                break;
+                                                                                                                            
             default:
                 break;
         }
@@ -193,7 +217,13 @@ const TouchpadGestureAction = new Lang.Class({
         global.stage.disconnect(this._gestureCallbackID);
         this.disconnect(this._actionCallbackID);
         schema.disconnect(this._updateSettingsCallbackID);
-    }
+    },
+
+    _sendKeyEvent: function (...keys) {
+        let currentTime = Clutter.get_current_event_time();
+        keys.forEach(key => this._virtualDevice.notify_keyval(currentTime, key, Clutter.KeyState.PRESSED));
+        keys.forEach(key => this._virtualDevice.notify_keyval(currentTime, key, Clutter.KeyState.RELEASED));
+    },
 });
 
 function enable() {
@@ -208,7 +238,7 @@ function disable() {
     });
 }
 
-function activateNextWindowIndex(change){
+function activateNextWindowIndex(change,switchTabs){
     //get windows list
     windows = global.get_window_actors().filter(actor => {
         let win = actor.metaWindow;
@@ -222,6 +252,9 @@ function activateNextWindowIndex(change){
     });
     if (windows.length == 0)
         return;
+    if(windows.length ==1 && switchTabs){
+        nextTab(change);
+    }
     focusWindow = global.display.focus_window;
 
     if (focusWindow == null) {
@@ -258,6 +291,7 @@ function showOverview(){
         Main.overview.show();
     }
 }
+
 function showOverviewReverse(){
     //if on apps page switch to overview
     if(Main.overview.viewSelector._showAppsButton.checked){
@@ -271,4 +305,15 @@ function showOverviewReverse(){
     else {
         Main.overview.viewSelector.showApps();
     }
+}
+
+function previousTab(){
+    
+}
+
+function nextTab(change){
+    if(change<0)
+        gestureHandler._sendKeyEvent(Clutter.KEY_Control_L, Clutter.KEY_Page_Up);
+    else
+        gestureHandler._sendKeyEvent(Clutter.KEY_Control_L, Clutter.KEY_Page_Down);
 }

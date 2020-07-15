@@ -13,7 +13,11 @@ const actions = [
     'Toggle Overview/App drawer/desktop',
     'Reverse of Toggle Overview/App drawer/desktop',
     'Switch Application',
-    'Reverse Switch Application'
+    'Reverse Switch Application',
+    'Switch Tabs',
+    'Reverse Switch Tabs',
+    'Switch Application:Switch tabs when only one window',
+    'Reverse Switch Application:Switch tabs when only one window'
     ];
 
 function init() {
