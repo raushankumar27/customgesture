@@ -2,6 +2,7 @@ const Clutter = imports.gi.Clutter;
 const Config = imports.misc.config;
 const Lang = imports.lang;
 const Main = imports.ui.main;
+const Overview = imports.ui.overview;
 const Meta = imports.gi.Meta;
 const Shell = imports.gi.Shell;
 const Signals = imports.signals;
@@ -10,7 +11,7 @@ const Utils = imports.misc.extensionUtils;
 const Gettext = imports.gettext.domain('customgestures');
 const _ = Gettext.gettext;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Convenience = Extension.imports.convenience;
+const Settings = Extension.imports.settings;
 
 // Our custom gesture handler instance
 let gestureHandler = null;
@@ -24,9 +25,11 @@ let currentTime = null;
 let focusWindow = global.display.focus_window;
 let nextWindow;
 let windows;
+let config;
 
 function init() {
-    schema = Convenience.getSettings();
+    schema= Settings.get_local_gsettings(Settings.SCHEMA_PATH);
+    config = new Settings.Prefs();
 }
 
 const TouchpadGestureAction = new Lang.Class({
@@ -38,7 +41,7 @@ const TouchpadGestureAction = new Lang.Class({
 
         this._updateSettings();
 
-        this._gestureCallbackID = actor.connect('captured-event', Lang.bind(this, this._handleEvent));
+        this._gestureCallbackID = actor.connect('captured-event::touchpad', Lang.bind(this, this._handleEvent));
         this._actionCallbackID = this.connect('activated', Lang.bind (this, this._doAction));
         this._updateSettingsCallbackID = schema.connect('changed', Lang.bind(this, this._updateSettings));
         let seat = Clutter.get_default_backend().get_default_seat();
@@ -75,10 +78,11 @@ const TouchpadGestureAction = new Lang.Class({
     },
 
     _handleEvent: function(actor, event) {
+        
         if (event.type() != Clutter.EventType.TOUCHPAD_SWIPE)
             return Clutter.EVENT_PROPAGATE;
-
-        if (event.get_touchpad_gesture_finger_count() != 3)
+        
+        if (event.get_touchpad_gesture_finger_count() != 4)
             return Clutter.EVENT_PROPAGATE;
 
         if (event.get_gesture_phase() == Clutter.TouchpadGesturePhase.UPDATE) {
@@ -99,81 +103,45 @@ const TouchpadGestureAction = new Lang.Class({
 
     _doAction: function (sender, dir, fingerCount) {
         let action = null;
-
-        if (fingerCount == 3) {
+        if (fingerCount == 4) {
             switch (dir) {
                 case Meta.MotionDirection.LEFT:
-                    action = this._leftThreeAction;
+                    action = this._horizontalFourAction;
                     break;
                 case Meta.MotionDirection.RIGHT:
-                    action = this._rightThreeAction;
+                    action = this._horizontalFourAction;
                     break;
                 case Meta.MotionDirection.UP:
-                    action = this._upThreeAction;
+                    action = this._verticalFourAction;
                     break;
                 case Meta.MotionDirection.DOWN:
-                    action = this._downThreeAction;
+                    action = this._verticalFourAction;
                     break;
                 default:
                     break;
             }
         }
-
         if (action == null) {
             return;
         }
         switch (action) {
             case 0:
-                //overview->apps->desktop
-                showOverview();
+                if(dir == Meta.MotionDirection.LEFT || dir == Meta.MotionDirection.UP ){
+                    activateNextWindowIndex(1,true);
+                }
+                if(dir == Meta.MotionDirection.RIGHT || dir == Meta.MotionDirection.DOWN ){
+                    activateNextWindowIndex(-1,true);
+                }
                 break;
             case 1:
-                //apps->overview->desktop
-                showOverviewReverse();
-                break;
-            case 2:
-                activateNextWindowIndex(1,false);
-                break;
-            case 3:
-                activateNextWindowIndex(-1,false);
-                break;
-            case 4:
-                nextTab(1);
-                break;
-            case 5:
-                nextTab(-1);
-                break;
-            case 6:
-                activateNextWindowIndex(1,true);
-                break;
-            case 7:
-                activateNextWindowIndex(-1,true);
-                break;
-            case 8:
-                showOverviewReverse();
-                break;
-            case 9:
-                showOverview();
-                break;
-            case 10:
-                activateNextWindowIndex(-1,false);
-                break;
-            case 11:
-                activateNextWindowIndex(1,false);
-                break;
-            case 12:
-                nextTab(-1);
-                break;
-            case 13:
-                nextTab(1);
-                break;
-            case 14:
-                activateNextWindowIndex(-1,true);
-                break;
-            case 15:
-                activateNextWindowIndex(1,true);
-                break;
-                                                                                                                            
+                //send to another workspace
+                if(dir == Meta.MotionDirection.LEFT || dir == Meta.MotionDirection.UP){
+                    changeWorkspace(Meta.MotionDirection.LEFT)
+                }
+                if(dir == Meta.MotionDirection.RIGHT || dir == Meta.MotionDirection.DOWN){
+                    changeWorkspace(Meta.MotionDirection.RIGHT)
+                }
+                break;                                                                                                   
             default:
                 break;
         }
@@ -182,16 +150,16 @@ const TouchpadGestureAction = new Lang.Class({
     _checkSwipeValid: function (dir, fingerCount, motion) {
         const MOTION_THRESHOLD = 50;
 
-        if (fingerCount == 3) {
+        if (fingerCount == 4) {
             switch (dir) {
                 case Meta.MotionDirection.LEFT:
-                    return this._leftThreeEnabled && (motion > (50 - this._horizontalSensitivityAdjustment));
+                    return  (motion > (50 - this._horizontalSensitivityAdjustment));
                 case Meta.MotionDirection.RIGHT:
-                    return this._leftThreeEnabled && (motion > (50 - this._horizontalSensitivityAdjustment));
+                    return  (motion > (50 - this._horizontalSensitivityAdjustment));
                 case Meta.MotionDirection.UP:
-                    return this._upThreeEnabled && (motion > (50 - this._verticalSensitivityAdjustment));
+                    return  (motion > (50 - this._verticalSensitivityAdjustment));
                 case Meta.MotionDirection.DOWN:
-                    return this._upThreeEnabled && (motion > (50 - this._verticalSensitivityAdjustment));
+                    return (motion > (50 - this._verticalSensitivityAdjustment));
                 default:
                     break;
             }
@@ -201,22 +169,16 @@ const TouchpadGestureAction = new Lang.Class({
     },
 
     _updateSettings: function () {
-        this._leftThreeEnabled = schema.get_boolean('left-three-swipes');
-        this._leftThreeAction = schema.get_enum('left-three-action');
-        this._rightThreeEnabled = schema.get_boolean('left-three-swipes');
-        this._rightThreeAction = schema.get_enum('right-three-action');
-        this._upThreeEnabled = schema.get_boolean('up-three-swipes');
-        this._upThreeAction = schema.get_enum('up-three-action');
-        this._downThreeEnabled = schema.get_boolean('up-three-swipes');
-        this._downThreeAction = schema.get_enum('down-three-action');
-        this._verticalSensitivityAdjustment = schema.get_int('vertical-sensitivity-adjustment');
-        this._horizontalSensitivityAdjustment = schema.get_int('horizontal-sensitivity-adjustment');
+        this._horizontalFourAction=config.HORIZONTAL_FOUR_ACTION.get();
+        this._verticalFourAction=config.VERTICAL_FOUR_ACTION.get();
+        this._verticalSensitivityAdjustment = 0;
+        this._horizontalSensitivityAdjustment = 0;
     },
 
     _cleanup: function() {
         global.stage.disconnect(this._gestureCallbackID);
         this.disconnect(this._actionCallbackID);
-        schema.disconnect(this._updateSettingsCallbackID);
+        // schema.disconnect(this._updateSettingsCallbackID);
     },
 
     _sendKeyEvent: function (...keys) {
@@ -254,6 +216,7 @@ function activateNextWindowIndex(change,switchTabs){
         return;
     if(windows.length ==1 && switchTabs){
         nextTab(change);
+        return;
     }
     focusWindow = global.display.focus_window;
 
@@ -270,45 +233,12 @@ function activateNextWindowIndex(change,switchTabs){
                     index=windows.length -1 ;
                 }
                 nextWindow = windows[index].metaWindow;
-                Main.activateWindow(nextWindow);
-                return;
+                break;
             }
         }
     }
-}
-
-function showOverview(){
-    //if apps pagr is open close overview
-    if(Main.overview.viewSelector._showAppsButton.checked){
-        Main.overview.hide();
-    }
-    //if overview is open show apps page
-    else if (Main.overview._shown){
-        Main.overview.viewSelector.showApps();
-    }
-    //open overview
-    else{
-        Main.overview.show();
-    }
-}
-
-function showOverviewReverse(){
-    //if on apps page switch to overview
-    if(Main.overview.viewSelector._showAppsButton.checked){
-        Main.overview.viewSelector._toggleAppsPage();
-    }
-    //if on overview close it
-    else if(Main.overview._shown){
-        Main.overview.toggle();
-    }
-    //if on desktop swich to app page
-    else {
-        Main.overview.viewSelector.showApps();
-    }
-}
-
-function previousTab(){
-    
+    Main.activateWindow(nextWindow);
+    return;
 }
 
 function nextTab(change){
@@ -317,3 +247,12 @@ function nextTab(change){
     else
         gestureHandler._sendKeyEvent(Clutter.KEY_Control_L, Clutter.KEY_Page_Down);
 }
+
+function changeWorkspace(dir2){
+    if((Shell.ActionMode.NORMAL & Main.actionMode)==0){
+        return;
+    }
+    focusWindow = global.display.focus_window;
+    let workspace = focusWindow.get_workspace();
+    focusWindow.change_workspace(workspace.get_neighbor(dir2));
+} 

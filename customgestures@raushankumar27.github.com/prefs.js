@@ -1,136 +1,105 @@
-const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
-const GObject = imports.gi.GObject;
-const Lang = imports.lang;
-
-const Gettext = imports.gettext.domain('customgestures');
-const _ = Gettext.gettext;
 const Extension = imports.misc.extensionUtils.getCurrentExtension();
-const Convenience = Extension.imports.convenience;
+const Settings = Extension.imports.settings;
+const Config = imports.misc.config;
 
-let schema = null;
-const actions = [
-    'Toggle Overview/App drawer/desktop',
-    'Reverse of Toggle Overview/App drawer/desktop',
-    'Switch Application',
-    'Reverse Switch Application',
-    'Switch Tabs',
-    'Reverse Switch Tabs',
-    'Switch Application:Switch tabs when only one window',
-    'Reverse Switch Application:Switch tabs when only one window'
-    ];
+let horizontalfourComboBox = null;
+let verticalfourComboBox = null;
 
-function init() {
-    schema = Convenience.getSettings();
+
+let actions=["Switch Windows/tabs","Send to previous/next workspace","None"]
+
+function init() { }
+
+function buildPrefsWidget() {
+    let config = new Settings.Prefs();
+
+    let frame;
+    frame = new Gtk.Box({
+        orientation: Gtk.Orientation.VERTICAL,
+        margin_top: 20,
+        margin_bottom: 20,
+        margin_start: 20,
+        margin_end: 20,
+        spacing: 20
+    });
+
+
+    horizontalfourComboBox = addComboBox(frame, "Horizontal 4 finger", config.HORIZONTAL_FOUR_ACTION,actions);
+    verticalfourComboBox = addComboBox(frame, "Vertical 4 finger", config.VERTICAL_FOUR_ACTION,actions);
+
+    return frame;
 }
 
-const customGesturesSettingsWidget = new GObject.Class({
-    Name: 'customGestures.prefs.customGesturesSettingsWidget',
-    GTypeName: 'customGesturesSettingsWidget',
-    Extends: Gtk.VBox,
-
-    _init: function (params) {
-        this.parent (params);
-
-        this._buildUI();
-        this._initUI();
-    },
-
-    _buildUI: function() {
-        // The swipe options grid setup
-        this._swipeOptionsFrame = new Gtk.Frame();
-        this._swipeOptionsFrame.set_label("    Swipe Options");
-        this._swipeOptionsGrid = new Gtk.Grid({
-            column_homogeneous: false,
-            column_spacing: 20,
-            row_homogeneous: true,
-            row_spacing: 5,
-            margin: 20
-        });
-        this._swipeOptionsFrame.add(this._swipeOptionsGrid);
-        
-        // The swipe options
-        // Three finger horizontal
-        this._leftThreeLabel = new Gtk.Label({label: "3 Finger Horizontal Gestures"});
-        this._leftThreeSwitch = new Gtk.Switch({ valign: Gtk.Align.CENTER });
-        this._leftThreeCombo = new Gtk.ComboBoxText();
-        this._swipeOptionsGrid.attach(this._leftThreeLabel, 0, 0, 1, 1);
-        this._swipeOptionsGrid.attach(this._leftThreeSwitch, 1, 0, 1, 1);
-        this._swipeOptionsGrid.attach(this._leftThreeCombo, 2, 0, 1, 1);
-
-        // Three finger vertical
-        this._upThreeLabel = new Gtk.Label({label: "3 Finger Vertical Gestures"});
-        this._upThreeSwitch = new Gtk.Switch({ valign: Gtk.Align.CENTER });
-        this._upThreeCombo = new Gtk.ComboBoxText();
-        this._swipeOptionsGrid.attach(this._upThreeLabel, 0, 1, 1, 1);
-        this._swipeOptionsGrid.attach(this._upThreeSwitch, 1, 1, 1, 1);
-        this._swipeOptionsGrid.attach(this._upThreeCombo, 2, 1, 1, 1);
-        
-        
-        // The sensitivity options
-        this._sensitivityOptionsFrame = new Gtk.Frame();
-        this._sensitivityOptionsFrame.set_label("    Sensitivity Options");
-        this._sensitivityOptionsGrid = new Gtk.Grid({
-            column_homogeneous: false,
-            column_spacing: 20,
-            row_homogeneous: true,
-            row_spacing: 5,
-            margin:20
-        });
-        this._sensitivityOptionsFrame.add(this._sensitivityOptionsGrid);
-
-        // Vertical sensitivity
-        this._verticalSensitivityLabel = new Gtk.Label({label: "Vertical Sensitivity Adjustment"});
-        this._verticalSensitivitySpinButton = Gtk.SpinButton.new_with_range(-50, 50, 1);
-        this._sensitivityOptionsGrid.attach(this._verticalSensitivityLabel, 0, 0, 1, 1);
-        this._sensitivityOptionsGrid.attach(this._verticalSensitivitySpinButton, 1, 0, 1, 1);
-
-        // Horizontal sensitivity
-        this._horizontalSensitivityLabel = new Gtk.Label({label: "Horizontal Sensitivity Adjustment"});
-        this._horizontalSensitivitySpinButton = Gtk.SpinButton.new_with_range(-50, 50, 1);
-        this._sensitivityOptionsGrid.attach(this._horizontalSensitivityLabel, 0, 1, 1, 1);
-        this._sensitivityOptionsGrid.attach(this._horizontalSensitivitySpinButton, 1, 1, 1, 1);
-
-        // Add everything to the main view
-        this.add(this._swipeOptionsFrame);
-        this.add(this._sensitivityOptionsFrame);
-    },
-
-    _initUI: function() {
-        
-
-        // Bind the three swipe toggles to their setting values
-        schema.bind('left-three-swipes', this._leftThreeSwitch, 'active', Gio.SettingsBindFlags.DEFAULT);
-        schema.bind('up-three-swipes', this._upThreeSwitch, 'active', Gio.SettingsBindFlags.DEFAULT);
-        
-        // Action set up
-        this._leftThreeCombo.connect('changed', Lang.bind(this, this._leftThreeComboChanged));
-        this._upThreeCombo.connect('changed', Lang.bind(this, this._upThreeComboChanged));
-        for (let i = 0; i < actions.length; i++) {
-            this._leftThreeCombo.append_text(actions[i]);
-            this._upThreeCombo.append_text(actions[i]);
+function addSlider(frame, labelText, prefConfig, lower, upper, decimalDigits) {
+    let scale = new Gtk.Scale({
+        digits: decimalDigits,
+        adjustment: new Gtk.Adjustment({ lower: lower, upper: upper }),
+        value_pos: Gtk.PositionType.RIGHT,
+        hexpand: true,
+        halign: Gtk.Align.END
+    });
+    scale.set_value(prefConfig.get());
+    scale.connect('value-changed', function (sw) {
+        var newval = sw.get_value();
+        if (newval != prefConfig.get()) {
+            prefConfig.set(newval);
         }
-        this._leftThreeCombo.set_active(schema.get_enum('left-three-action'));
-        this._upThreeCombo.set_active(schema.get_enum('up-three-action'));
-        
-        // Sensitivity options setup
-        schema.bind('vertical-sensitivity-adjustment', this._verticalSensitivitySpinButton, 'value', Gio.SettingsBindFlags.DEFAULT);
-        schema.bind('horizontal-sensitivity-adjustment', this._horizontalSensitivitySpinButton, 'value', Gio.SettingsBindFlags.DEFAULT);
-    },
+    });
+    scale.set_size_request(400, 15);
 
-    _leftThreeComboChanged: function () {
-        schema.set_enum('left-three-action',this._leftThreeCombo.get_active());
-        schema.set_enum('right-three-action',this._leftThreeCombo.get_active()+actions.length);
-    },  
+    let hbox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 20 });
 
-    _upThreeComboChanged: function () {
-        schema.set_enum('up-three-action',this._upThreeCombo.get_active());
-        schema.set_enum('down-three-action',this._upThreeCombo.get_active()+actions.length);
-    },
-});
+    hbox.append(new Gtk.Label({ label: labelText, use_markup: true }));
+    hbox.append(scale);
 
-function buildPrefsWidget () {
-    let settingsWidget = new customGesturesSettingsWidget ();
-    settingsWidget.show_all ();
-    return settingsWidget;
+    frame.append(hbox);
+
+
+    return scale;
+}
+
+function addComboBox(frame, labelText, prefConfig,items) {
+    let gtkComboBoxText = new Gtk.ComboBoxText({ hexpand: true, halign: Gtk.Align.END });
+
+    let activeValue = prefConfig.get();
+    let values = items;
+
+    for (let i = 0; i < values.length; i++) {
+        gtkComboBoxText.append_text(values[i]);
+    }
+
+    gtkComboBoxText.set_active(activeValue);
+    gtkComboBoxText.connect('changed', function (sw) {
+    prefConfig.set(sw.get_active());
+    });
+
+    let hbox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 20 });
+    hbox.append(new Gtk.Label({ label: labelText, use_markup: true }));
+    hbox.append(gtkComboBoxText);
+
+    frame.append(hbox);
+
+
+    return gtkComboBoxText;
+}
+
+function addBooleanSwitch(frame, labelText, prefConfig) {
+    let gtkSwitch = new Gtk.Switch({ hexpand: true, halign: Gtk.Align.END });
+    gtkSwitch.set_active(prefConfig.get());
+    gtkSwitch.connect('state-set', function (sw) {
+        var newval = sw.get_active();
+        if (newval != prefConfig.get()) {
+            prefConfig.set(newval);
+        }
+    });
+
+    let hbox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 20 });
+    hbox.append(new Gtk.Label({ label: labelText, use_markup: true }));
+    hbox.append(gtkSwitch);
+
+    frame.append(hbox);
+
+
+    return gtkSwitch;
 }
