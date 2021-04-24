@@ -15,15 +15,14 @@ git clone
 cd customgesture
 sh install.sh
 ```
-# 3 Finger UP/Down
+# 4 Finger UP/Down
 
-Open overview->Open apps Page-> Closes overview
-Can toggle setting to follow in reverse order
+Switch windows
+Send current window to other workspace
 
-# 3 finger Left/Right
-Toggle application. Sequence will be based on window creation.
-Switch between open window.
-Switch tabs: switch tabs based on gesture
-Switch tabs, when there is only one window: when there is only one window, switch tabs else switch windows.
+# 4 finger Left/Right
+
+Switch windows
+Send current window to other workspace
 
 # Provide Suggestion for new feature
